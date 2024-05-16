@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "tsnd --respawn -r tsconfig-paths/register --pretty --transpile-only ./src/index.ts",
+    "dev": "tsnd --respawn -r tsconfig-paths/register --pretty --transpile-only --env-file=.env ./src/index.ts",
     "build": "tsc && tsc-alias",
     "start": "node ./dist"
   },
