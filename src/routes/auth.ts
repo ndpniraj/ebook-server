@@ -1,10 +1,8 @@
+import { generateAuthLink } from "@/controllers/auth";
 import { Router } from "express";
 
 const authRouter = Router();
 
-authRouter.post("/generate-link", (req, res) => {
-  // Generate authentication link
-  // and send that link to the users email address
-});
+authRouter.post("/generate-link", generateAuthLink);
 
 export default authRouter;
