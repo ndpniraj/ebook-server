@@ -1,6 +1,13 @@
-import { Schema, model } from "mongoose";
+import { ObjectId, Schema, model } from "mongoose";
 
-const userSchema = new Schema({
+export interface UserDoc {
+  _id: ObjectId;
+  email: string;
+  role: "user" | "author";
+  name?: string;
+}
+
+const userSchema = new Schema<UserDoc>({
   name: {
     type: String,
     trim: true,
