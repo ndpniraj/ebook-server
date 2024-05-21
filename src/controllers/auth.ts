@@ -1,13 +1,15 @@
-import { Request, Response, RequestHandler } from "express";
+import { RequestHandler } from "express";
 import crypto from "crypto";
-import nodemailer from "nodemailer";
 import VerificationTokenModel from "@/models/verificationToken";
 import UserModel from "@/models/user";
 import mail from "@/utils/mail";
 import { formatUserProfile, sendErrorResponse } from "@/utils/helper";
 import jwt from "jsonwebtoken";
-import cloudinary from "@/cloud/cludinary";
-import { uploadAvatarToCloudinary } from "@/utils/fileUpload";
+import {
+  uploadAvatarToAws,
+  uploadAvatarToCloudinary,
+} from "@/utils/fileUpload";
+import slugify from "slugify";
 
 export const generateAuthLink: RequestHandler = async (req, res) => {
   // Generate authentication link
@@ -136,7 +138,18 @@ export const updateProfile: RequestHandler = async (req, res) => {
   const file = req.files.avatar;
   if (!Array.isArray(file)) {
     // if you are using cloudinary this is the method you should use
-    user.avatar = await uploadAvatarToCloudinary(file, user.avatar?.id);
+    // user.avatar = await uploadAvatarToCloudinary(file, user.avatar?.id);
+
+    // if you are using aws this is the method you should use
+    const uniqueFileName = `${user._id}-${slugify(req.body.name, {
+      lower: true,
+      replacement: "-",
+    })}.png`;
+    user.avatar = await uploadAvatarToAws(
+      file,
+      uniqueFileName,
+      user.avatar?.id
+    );
 
     await user.save();
   }
