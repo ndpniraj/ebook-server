@@ -94,9 +94,17 @@ export const verifyAuthToken: RequestHandler = async (req, res) => {
     expires: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
   });
 
-  res.redirect(
-    `${process.env.AUTH_SUCCESS_URL}?profile=${JSON.stringify(
-      formatUserProfile(user)
-    )}`
-  );
+  // res.redirect(
+  //   `${process.env.AUTH_SUCCESS_URL}?profile=${JSON.stringify(
+  //     formatUserProfile(user)
+  //   )}`
+  // );
+
+  res.send();
+};
+
+export const sendProfileInfo: RequestHandler = (req, res) => {
+  res.json({
+    profile: req.user,
+  });
 };

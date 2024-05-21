@@ -1,6 +1,7 @@
 import "express-async-errors";
 import "@/db/connect";
 import express, { ErrorRequestHandler } from "express";
+import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth";
 import { errorHandler } from "./middlewares/error";
 
@@ -14,6 +15,7 @@ const app = express();
 // });
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 app.use("/auth", authRouter);
 app.post("/test", (req, res) => {
