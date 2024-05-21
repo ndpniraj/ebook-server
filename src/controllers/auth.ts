@@ -6,6 +6,8 @@ import UserModel from "@/models/user";
 import mail from "@/utils/mail";
 import { formatUserProfile, sendErrorResponse } from "@/utils/helper";
 import jwt from "jsonwebtoken";
+import cloudinary from "@/cloud/cludinary";
+import { uploadAvatarToCloudinary } from "@/utils/fileUpload";
 
 export const generateAuthLink: RequestHandler = async (req, res) => {
   // Generate authentication link
@@ -131,6 +133,13 @@ export const updateProfile: RequestHandler = async (req, res) => {
     });
 
   // if there is any file upload them to cloud and update the database
+  const file = req.files.avatar;
+  if (!Array.isArray(file)) {
+    // if you are using cloudinary this is the method you should use
+    user.avatar = await uploadAvatarToCloudinary(file, user.avatar?.id);
+
+    await user.save();
+  }
 
   res.json({ profile: formatUserProfile(user) });
 };
