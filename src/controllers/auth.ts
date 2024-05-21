@@ -94,13 +94,11 @@ export const verifyAuthToken: RequestHandler = async (req, res) => {
     expires: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
   });
 
-  // res.redirect(
-  //   `${process.env.AUTH_SUCCESS_URL}?profile=${JSON.stringify(
-  //     formatUserProfile(user)
-  //   )}`
-  // );
-
-  res.send();
+  res.redirect(
+    `${process.env.AUTH_SUCCESS_URL}?profile=${JSON.stringify(
+      formatUserProfile(user)
+    )}`
+  );
 };
 
 export const sendProfileInfo: RequestHandler = (req, res) => {
@@ -111,4 +109,28 @@ export const sendProfileInfo: RequestHandler = (req, res) => {
 
 export const logout: RequestHandler = (req, res) => {
   res.clearCookie("authToken").send();
+};
+
+export const updateProfile: RequestHandler = async (req, res) => {
+  const user = await UserModel.findByIdAndUpdate(
+    req.user.id,
+    {
+      name: req.body.name,
+      signedUp: true,
+    },
+    {
+      new: true,
+    }
+  );
+
+  if (!user)
+    return sendErrorResponse({
+      res,
+      message: "Something went wrong user not found!",
+      status: 500,
+    });
+
+  // if there is any file upload them to cloud and update the database
+
+  res.json({ profile: formatUserProfile(user) });
 };
