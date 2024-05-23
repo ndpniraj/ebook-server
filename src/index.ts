@@ -9,6 +9,7 @@ import { errorHandler } from "./middlewares/error";
 import { fileParser } from "./middlewares/file";
 import authorRouter from "./routes/author";
 import bookRouter from "./routes/book";
+import formidable from "formidable";
 
 const app = express();
 
@@ -29,9 +30,14 @@ app.use("/auth", authRouter);
 app.use("/author", authorRouter);
 app.use("/book", bookRouter);
 
-app.post("/test", fileParser, (req, res) => {
-  console.log(req.files);
-  console.log(req.body);
+app.post("/test", async (req, res) => {
+  const form = formidable({
+    uploadDir: path.join(__dirname, "./books"),
+    filename(name, ext, part, form) {
+      return name + ".jpg";
+    },
+  });
+  await form.parse(req);
   res.json({});
 });
 
