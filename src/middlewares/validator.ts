@@ -20,6 +20,8 @@ export const newUserSchema = {
     .trim(),
 };
 
+export const newAuthorSchema = {};
+
 export const validate = <T extends ZodRawShape>(obj: T): RequestHandler => {
   return (req, res, next) => {
     const schema = z.object(obj);

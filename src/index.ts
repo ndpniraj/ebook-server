@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth";
 import { errorHandler } from "./middlewares/error";
 import { fileParser } from "./middlewares/file";
+import authorRouter from "./routes/author";
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use("/auth", authRouter);
+app.use("/author", authorRouter);
 app.post("/test", fileParser, (req, res) => {
   console.log(req.files);
   console.log(req.body);
