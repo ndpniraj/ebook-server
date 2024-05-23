@@ -1,5 +1,38 @@
+import AuthorModel from "@/models/author";
+import UserModel from "@/models/user";
 import { RequestAuthorHandler } from "@/types";
+import { sendErrorResponse } from "@/utils/helper";
+import slugify from "slugify";
 
-export const registerAuthor: RequestAuthorHandler = (req, res) => {
-  req.body.socialLinks;
+export const registerAuthor: RequestAuthorHandler = async (req, res) => {
+  const { body, user } = req;
+  if (!user.signedUp) {
+    return sendErrorResponse({
+      message: "User must be signed up before registering as author!",
+      status: 401,
+      res,
+    });
+  }
+
+  const newAuthor = new AuthorModel({
+    name: body.name,
+    about: body.about,
+    userId: user.id,
+    socialLinks: body.socialLinks,
+  });
+
+  const uniqueSlug = slugify(`${newAuthor.name} ${newAuthor._id}`, {
+    lower: true,
+    replacement: "-",
+  });
+
+  newAuthor.slug = uniqueSlug;
+  await newAuthor.save();
+
+  await UserModel.findByIdAndUpdate(user.id, {
+    role: "author",
+    authorId: newAuthor._id,
+  });
+
+  res.json({ message: "Thanks for registering as an author." });
 };
