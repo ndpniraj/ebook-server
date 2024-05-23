@@ -1,16 +1,16 @@
 import { RequestHandler } from "express";
-import { ZodRawShape, z } from "zod";
+import { ZodRawShape, ZodType, z } from "zod";
 
-export const emailValidationSchema = {
+export const emailValidationSchema = z.object({
   email: z
     .string({
       required_error: "Email is missing!",
       invalid_type_error: "Invalid email type!",
     })
     .email("Invalid email!"),
-};
+});
 
-export const newUserSchema = {
+export const newUserSchema = z.object({
   name: z
     .string({
       required_error: "Name is missing!",
@@ -18,9 +18,9 @@ export const newUserSchema = {
     })
     .min(3, "Name must be 3 characters long!")
     .trim(),
-};
+});
 
-export const newAuthorSchema = {
+export const newAuthorSchema = z.object({
   name: z
     .string({
       required_error: "Name is missing!",
@@ -38,12 +38,12 @@ export const newAuthorSchema = {
   socialLinks: z
     .array(z.string().url("Social links can only be list of  valid URLs!"))
     .optional(),
-};
+});
 
-export const validate = <T extends ZodRawShape>(obj: T): RequestHandler => {
+export const validate = <T extends unknown>(
+  schema: ZodType<T>
+): RequestHandler => {
   return (req, res, next) => {
-    const schema = z.object(obj);
-
     const result = schema.safeParse(req.body);
 
     if (result.success) {

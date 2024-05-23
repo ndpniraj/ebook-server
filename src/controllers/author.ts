@@ -1,3 +1,5 @@
-import { RequestHandler } from "express";
+import { RequestAuthorHandler } from "@/types";
 
-export const registerAuthor: RequestHandler = (req, res) => {};
+export const registerAuthor: RequestAuthorHandler = (req, res) => {
+  req.body.socialLinks;
+};
