@@ -1,6 +1,8 @@
 import "express-async-errors";
 import "@/db/connect";
 import express, { ErrorRequestHandler } from "express";
+import path from "path";
+
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth";
 import { errorHandler } from "./middlewares/error";
@@ -9,6 +11,8 @@ import authorRouter from "./routes/author";
 import bookRouter from "./routes/book";
 
 const app = express();
+
+const publicPath = path.join(__dirname, "./books");
 
 // app.use((req, res, next) => {
 //   req.on("data", (chunk) => {
@@ -19,6 +23,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use("/books", express.static(publicPath));
 
 app.use("/auth", authRouter);
 app.use("/author", authorRouter);

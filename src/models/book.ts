@@ -65,6 +65,7 @@ const bookSchema = new Schema<BookDoc>({
     required: true,
   },
   price: {
+    type: Object,
     required: true,
     mrp: {
       type: Number,
@@ -80,6 +81,7 @@ const bookSchema = new Schema<BookDoc>({
     id: String,
   },
   fileInfo: {
+    type: Object,
     required: true,
     url: {
       type: String,
