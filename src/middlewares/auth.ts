@@ -13,6 +13,7 @@ declare global {
         role: "user" | "author";
         avatar?: string;
         signedUp: boolean;
+        authorId?: string;
       };
     }
   }

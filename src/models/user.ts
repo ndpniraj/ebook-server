@@ -37,7 +37,7 @@ const userSchema = new Schema<UserDoc>({
   },
   authorId: {
     type: Schema.Types.ObjectId,
-    ref: "User",
+    ref: "Author",
   },
 });
 

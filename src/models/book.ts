@@ -1,7 +1,7 @@
-import { Model, ObjectId, Schema, model } from "mongoose";
+import { Model, ObjectId, Schema, Types, model } from "mongoose";
 
 export interface BookDoc {
-  author: ObjectId;
+  author: Types.ObjectId;
   title: string;
   slug: string;
   description: string;
