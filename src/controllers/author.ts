@@ -2,6 +2,7 @@ import AuthorModel from "@/models/author";
 import UserModel from "@/models/user";
 import { RequestAuthorHandler } from "@/types";
 import { sendErrorResponse } from "@/utils/helper";
+import { RequestHandler } from "express";
 import slugify from "slugify";
 
 export const registerAuthor: RequestAuthorHandler = async (req, res) => {
@@ -35,4 +36,23 @@ export const registerAuthor: RequestAuthorHandler = async (req, res) => {
   });
 
   res.json({ message: "Thanks for registering as an author." });
+};
+
+export const getAuthorDetails: RequestHandler = async (req, res) => {
+  const { slug } = req.params;
+
+  const author = await AuthorModel.findOne({ slug });
+  if (!author)
+    return sendErrorResponse({
+      res,
+      message: "Author not found!",
+      status: 404,
+    });
+
+  res.json({
+    id: author._id,
+    name: author.name,
+    about: author.about,
+    socialLinks: author.socialLinks,
+  });
 };

@@ -1,4 +1,4 @@
-import { registerAuthor } from "@/controllers/author";
+import { getAuthorDetails, registerAuthor } from "@/controllers/author";
 import { isAuth } from "@/middlewares/auth";
 import { newAuthorSchema, validate } from "@/middlewares/validator";
 import { Router } from "express";
@@ -11,5 +11,6 @@ authorRouter.post(
   validate(newAuthorSchema),
   registerAuthor
 );
+authorRouter.get("/:slug", getAuthorDetails);
 
 export default authorRouter;
