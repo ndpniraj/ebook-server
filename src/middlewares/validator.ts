@@ -20,7 +20,25 @@ export const newUserSchema = {
     .trim(),
 };
 
-export const newAuthorSchema = {};
+export const newAuthorSchema = {
+  name: z
+    .string({
+      required_error: "Name is missing!",
+      invalid_type_error: "Invalid name!",
+    })
+    .trim()
+    .min(3, "Invalid name"),
+  about: z
+    .string({
+      required_error: "About is missing!",
+      invalid_type_error: "Invalid about!",
+    })
+    .trim()
+    .min(100, "Please write at least 100 characters about yourself!"),
+  socialLinks: z
+    .array(z.string().url("Social links can only be list of  valid URLs!"))
+    .optional(),
+};
 
 export const validate = <T extends ZodRawShape>(obj: T): RequestHandler => {
   return (req, res, next) => {
