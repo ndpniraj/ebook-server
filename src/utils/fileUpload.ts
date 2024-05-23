@@ -53,3 +53,11 @@ export const updateAvatarToAws = async (
     url: `https://${bucketName}.s3.amazonaws.com/${uniqueFileName}`,
   };
 };
+
+export const uploadCoverToCloudinary = async (file: File) => {
+  const { secure_url, public_id } = await cloudinary.uploader.upload(
+    file.filepath
+  );
+
+  return { id: public_id, url: secure_url };
+};
