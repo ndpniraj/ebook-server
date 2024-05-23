@@ -6,8 +6,8 @@ import mail from "@/utils/mail";
 import { formatUserProfile, sendErrorResponse } from "@/utils/helper";
 import jwt from "jsonwebtoken";
 import {
-  uploadAvatarToAws,
-  uploadAvatarToCloudinary,
+  updateAvatarToAws,
+  updateAvatarToCloudinary,
 } from "@/utils/fileUpload";
 import slugify from "slugify";
 
@@ -136,16 +136,16 @@ export const updateProfile: RequestHandler = async (req, res) => {
 
   // if there is any file upload them to cloud and update the database
   const file = req.files.avatar;
-  if (!Array.isArray(file)) {
+  if (file && !Array.isArray(file)) {
     // if you are using cloudinary this is the method you should use
-    // user.avatar = await uploadAvatarToCloudinary(file, user.avatar?.id);
+    // user.avatar = await updateAvatarToCloudinary(file, user.avatar?.id);
 
     // if you are using aws this is the method you should use
     const uniqueFileName = `${user._id}-${slugify(req.body.name, {
       lower: true,
       replacement: "-",
     })}.png`;
-    user.avatar = await uploadAvatarToAws(
+    user.avatar = await updateAvatarToAws(
       file,
       uniqueFileName,
       user.avatar?.id

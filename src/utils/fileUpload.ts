@@ -5,7 +5,7 @@ import { Request } from "express";
 import { File } from "formidable";
 import fs from "fs";
 
-export const uploadAvatarToCloudinary = async (
+export const updateAvatarToCloudinary = async (
   file: File,
   avatarId?: string
 ) => {
@@ -27,7 +27,7 @@ export const uploadAvatarToCloudinary = async (
   return { id: public_id, url: secure_url };
 };
 
-export const uploadAvatarToAws = async (
+export const updateAvatarToAws = async (
   file: File,
   uniqueFileName: string,
   avatarId?: string

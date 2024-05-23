@@ -5,7 +5,7 @@ declare global {
   namespace Express {
     export interface Request {
       // files: {[key: string]: File | File[]}
-      files: Record<string, File | File[]>;
+      files: Record<string, File | File[] | undefined>;
     }
   }
 }
