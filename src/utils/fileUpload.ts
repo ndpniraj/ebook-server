@@ -1,11 +1,16 @@
 import s3Client from "@/cloud/aws";
 import cloudinary from "@/cloud/cludinary";
-import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import {
+  DeleteObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
 import { Request } from "express";
 import { File } from "formidable";
 import fs from "fs";
 import path from "path";
 import { generateS3ClientPublicUrl } from "./helper";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 export const updateAvatarToCloudinary = async (
   file: File,
@@ -91,4 +96,24 @@ export const uploadBookToAws = async (
     id: uniqueFileName,
     url: generateS3ClientPublicUrl("ebook-public", uniqueFileName),
   };
+};
+
+interface FileInfo {
+  bucket: string;
+  uniqueKey: string;
+  contentType: string;
+}
+
+export const generateFileUploadUrl = async (
+  client: S3Client,
+  fileInfo: FileInfo
+) => {
+  const { bucket, uniqueKey, contentType } = fileInfo;
+  const command = new PutObjectCommand({
+    Bucket: bucket,
+    Key: uniqueKey,
+    ContentType: contentType,
+  });
+
+  return await getSignedUrl(client, command);
 };
