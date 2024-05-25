@@ -34,3 +34,10 @@ export function formatFileSize(bytes: number) {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 }
+
+export const generateS3ClientPublicUrl = (
+  bucketName: string,
+  uniqueKey: string
+): string => {
+  return `https://${bucketName}.s3.amazonaws.com/${uniqueKey}`;
+};

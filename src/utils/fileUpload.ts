@@ -5,6 +5,7 @@ import { Request } from "express";
 import { File } from "formidable";
 import fs from "fs";
 import path from "path";
+import { generateS3ClientPublicUrl } from "./helper";
 
 export const updateAvatarToCloudinary = async (
   file: File,
@@ -51,7 +52,7 @@ export const updateAvatarToAws = async (
 
   return {
     id: uniqueFileName,
-    url: `https://${bucketName}.s3.amazonaws.com/${uniqueFileName}`,
+    url: generateS3ClientPublicUrl("ebook-public", uniqueFileName),
   };
 };
 
@@ -73,4 +74,21 @@ export const uploadBookToLocalDir = (file: File, uniqueFileName: string) => {
   const filePath = path.join(bookStoragePath, uniqueFileName);
 
   fs.writeFileSync(filePath, fs.readFileSync(file.filepath));
+};
+
+export const uploadBookToAws = async (
+  filepath: string,
+  uniqueFileName: string
+) => {
+  const putCommand = new PutObjectCommand({
+    Bucket: process.env.AWS_PUBLIC_BUCKET,
+    Key: uniqueFileName,
+    Body: fs.readFileSync(filepath),
+  });
+  await s3Client.send(putCommand);
+
+  return {
+    id: uniqueFileName,
+    url: generateS3ClientPublicUrl("ebook-public", uniqueFileName),
+  };
 };
