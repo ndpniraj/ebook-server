@@ -1,8 +1,10 @@
 import BookModel, { BookDoc } from "@/models/book";
 import { CreateBookRequestHandler } from "@/types";
 import { uploadCoverToCloudinary } from "@/utils/fileUpload";
-import { formatFileSize } from "@/utils/helper";
+import { formatFileSize, sendErrorResponse } from "@/utils/helper";
 import { Types } from "mongoose";
+import path from "path";
+import fs from "fs";
 import slugify from "slugify";
 
 export const createNewBook: CreateBookRequestHandler = async (req, res) => {
@@ -19,19 +21,19 @@ export const createNewBook: CreateBookRequestHandler = async (req, res) => {
     publishedAt,
   } = body;
 
-  const { cover } = files;
+  const { cover, book } = files;
 
   const newBook = new BookModel<BookDoc>({
     title,
-    description,
-    genre,
-    language,
-    fileInfo: { size: formatFileSize(fileInfo.size), id: "" },
-    price,
-    publicationName,
-    publishedAt,
-    slug: "",
-    author: new Types.ObjectId(user.authorId),
+    // description,
+    // genre,
+    // language,
+    // fileInfo: { size: formatFileSize(fileInfo.size), id: "" },
+    // price,
+    // publicationName,
+    // publishedAt,
+    // slug: "",
+    // author: new Types.ObjectId(user.authorId),
   });
 
   newBook.slug = slugify(`${newBook.title} ${newBook._id}`, {
@@ -44,5 +46,32 @@ export const createNewBook: CreateBookRequestHandler = async (req, res) => {
     newBook.cover = await uploadCoverToCloudinary(cover);
   }
 
-  await newBook.save();
+  if (
+    !book ||
+    Array.isArray(book) ||
+    book.mimetype !== "application/epub+zip"
+  ) {
+    return sendErrorResponse({
+      message: "Invalid book file!",
+      status: 422,
+      res,
+    });
+  }
+
+  const bookStoragePath = path.join(__dirname, "../books");
+
+  if (!fs.existsSync(bookStoragePath)) {
+    fs.mkdirSync(bookStoragePath);
+  }
+
+  const uniqueFileName = slugify(`${newBook._id} ${newBook.title}.epub`, {
+    lower: true,
+    replacement: "-",
+  });
+  const filePath = path.join(bookStoragePath, uniqueFileName);
+
+  fs.writeFileSync(filePath, fs.readFileSync(book.filepath));
+
+  // await newBook.save();
+  res.send();
 };
