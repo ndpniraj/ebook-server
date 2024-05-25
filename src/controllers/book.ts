@@ -7,6 +7,7 @@ import slugify from "slugify";
 import fs from "fs";
 import s3Client from "@/cloud/aws";
 import { generateFileUploadUrl, uploadBookToAws } from "@/utils/fileUpload";
+import AuthorModel from "@/models/author";
 
 export const createNewBook: CreateBookRequestHandler = async (req, res) => {
   const { body, files, user } = req;
@@ -26,15 +27,15 @@ export const createNewBook: CreateBookRequestHandler = async (req, res) => {
 
   const newBook = new BookModel<BookDoc>({
     title,
-    // description,
-    // genre,
-    // language,
-    // fileInfo: { size: formatFileSize(fileInfo.size), id: "" },
-    // price,
-    // publicationName,
-    // publishedAt,
-    // slug: "",
-    // author: new Types.ObjectId(user.authorId),
+    description,
+    genre,
+    language,
+    fileInfo: { size: formatFileSize(fileInfo.size), id: "" },
+    price,
+    publicationName,
+    publishedAt,
+    slug: "",
+    author: new Types.ObjectId(user.authorId),
   });
 
   newBook.slug = slugify(`${newBook.title} ${newBook._id}`, {
@@ -52,7 +53,7 @@ export const createNewBook: CreateBookRequestHandler = async (req, res) => {
     uniqueKey: fileName,
   });
 
-  // newBook.fileInfo.id = fileName
+  newBook.fileInfo.id = fileName;
 
   // this will upload cover to the cloud
   if (cover && !Array.isArray(cover) && cover.mimetype?.startsWith("image")) {
@@ -64,6 +65,11 @@ export const createNewBook: CreateBookRequestHandler = async (req, res) => {
     newBook.cover = await uploadBookToAws(cover.filepath, uniqueFileName);
   }
 
-  // await newBook.save();
+  await AuthorModel.findByIdAndUpdate(user.authorId, {
+    $push: {
+      books: newBook._id,
+    },
+  });
+  await newBook.save();
   res.send(fileUploadUrl);
 };

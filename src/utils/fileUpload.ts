@@ -39,7 +39,7 @@ export const updateAvatarToAws = async (
   uniqueFileName: string,
   avatarId?: string
 ) => {
-  const bucketName = "ebook-public-data";
+  const bucketName = process.env.AWS_PUBLIC_BUCKET;
   if (avatarId) {
     const deleteCommand = new DeleteObjectCommand({
       Bucket: bucketName,
@@ -94,7 +94,10 @@ export const uploadBookToAws = async (
 
   return {
     id: uniqueFileName,
-    url: generateS3ClientPublicUrl("ebook-public", uniqueFileName),
+    url: generateS3ClientPublicUrl(
+      process.env.AWS_PUBLIC_BUCKET!,
+      uniqueFileName
+    ),
   };
 };
 

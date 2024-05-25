@@ -11,7 +11,7 @@ bookRouter.post(
   isAuth,
   isAuthor,
   fileParser,
-  // validate(newBookSchema),
+  validate(newBookSchema),
   createNewBook
 );
 
