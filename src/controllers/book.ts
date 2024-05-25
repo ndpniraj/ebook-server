@@ -1,12 +1,21 @@
 import BookModel, { BookDoc } from "@/models/book";
 import { CreateBookRequestHandler } from "@/types";
-import { formatFileSize, generateS3ClientPublicUrl } from "@/utils/helper";
+import {
+  formatFileSize,
+  generateS3ClientPublicUrl,
+  sendErrorResponse,
+} from "@/utils/helper";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { Types } from "mongoose";
 import slugify from "slugify";
 import fs from "fs";
 import s3Client from "@/cloud/aws";
-import { generateFileUploadUrl, uploadBookToAws } from "@/utils/fileUpload";
+import {
+  generateFileUploadUrl,
+  uploadBookToAws,
+  uploadBookToLocalDir,
+  uploadCoverToCloudinary,
+} from "@/utils/fileUpload";
 import AuthorModel from "@/models/author";
 
 export const createNewBook: CreateBookRequestHandler = async (req, res) => {
@@ -21,9 +30,10 @@ export const createNewBook: CreateBookRequestHandler = async (req, res) => {
     price,
     publicationName,
     publishedAt,
+    uploadMethod,
   } = body;
 
-  const { cover } = files;
+  const { cover, book } = files;
 
   const newBook = new BookModel<BookDoc>({
     title,
@@ -38,6 +48,8 @@ export const createNewBook: CreateBookRequestHandler = async (req, res) => {
     author: new Types.ObjectId(user.authorId),
   });
 
+  let fileUploadUrl = "";
+
   newBook.slug = slugify(`${newBook.title} ${newBook._id}`, {
     lower: true,
     replacement: "-",
@@ -47,22 +59,48 @@ export const createNewBook: CreateBookRequestHandler = async (req, res) => {
     lower: true,
     replacement: "-",
   });
-  const fileUploadUrl = await generateFileUploadUrl(s3Client, {
-    bucket: process.env.AWS_PRIVATE_BUCKET!,
-    contentType: fileInfo.type,
-    uniqueKey: fileName,
-  });
 
-  newBook.fileInfo.id = fileName;
+  if (uploadMethod === "local") {
+    // if you are not using AWS use the following logic
+    if (
+      !book ||
+      Array.isArray(book) ||
+      book.mimetype !== "application/epub+zip"
+    ) {
+      return sendErrorResponse({
+        message: "Invalid book file!",
+        status: 422,
+        res,
+      });
+    }
 
-  // this will upload cover to the cloud
-  if (cover && !Array.isArray(cover) && cover.mimetype?.startsWith("image")) {
-    const uniqueFileName = slugify(`${newBook._id} ${newBook.title}.png`, {
-      lower: true,
-      replacement: "-",
+    if (cover && !Array.isArray(cover) && cover.mimetype?.startsWith("image")) {
+      // if you are using cloudinary use this method
+      newBook.cover = await uploadCoverToCloudinary(cover);
+    }
+
+    uploadBookToLocalDir(book, fileName);
+  }
+
+  if (uploadMethod === "aws") {
+    // if you are using AWS use the following logic
+    fileUploadUrl = await generateFileUploadUrl(s3Client, {
+      bucket: process.env.AWS_PRIVATE_BUCKET!,
+      contentType: fileInfo.type,
+      uniqueKey: fileName,
     });
 
-    newBook.cover = await uploadBookToAws(cover.filepath, uniqueFileName);
+    newBook.fileInfo.id = fileName;
+
+    // this will upload cover to the cloud
+    if (cover && !Array.isArray(cover) && cover.mimetype?.startsWith("image")) {
+      const uniqueFileName = slugify(`${newBook._id} ${newBook.title}.png`, {
+        lower: true,
+        replacement: "-",
+      });
+
+      newBook.cover = await uploadBookToAws(cover.filepath, uniqueFileName);
+    }
   }
 
   await AuthorModel.findByIdAndUpdate(user.authorId, {
