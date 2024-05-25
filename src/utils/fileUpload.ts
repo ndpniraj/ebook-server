@@ -4,6 +4,7 @@ import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { Request } from "express";
 import { File } from "formidable";
 import fs from "fs";
+import path from "path";
 
 export const updateAvatarToCloudinary = async (
   file: File,
@@ -60,4 +61,16 @@ export const uploadCoverToCloudinary = async (file: File) => {
   );
 
   return { id: public_id, url: secure_url };
+};
+
+export const uploadBookToLocalDir = (file: File, uniqueFileName: string) => {
+  const bookStoragePath = path.join(__dirname, "../books");
+
+  if (!fs.existsSync(bookStoragePath)) {
+    fs.mkdirSync(bookStoragePath);
+  }
+
+  const filePath = path.join(bookStoragePath, uniqueFileName);
+
+  fs.writeFileSync(filePath, fs.readFileSync(file.filepath));
 };

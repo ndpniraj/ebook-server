@@ -1,11 +1,15 @@
 import BookModel, { BookDoc } from "@/models/book";
 import { CreateBookRequestHandler } from "@/types";
-import { uploadCoverToCloudinary } from "@/utils/fileUpload";
+import {
+  uploadBookToLocalDir,
+  uploadCoverToCloudinary,
+} from "@/utils/fileUpload";
 import { formatFileSize, sendErrorResponse } from "@/utils/helper";
 import { Types } from "mongoose";
 import path from "path";
 import fs from "fs";
 import slugify from "slugify";
+import AuthorModel from "@/models/author";
 
 export const createNewBook: CreateBookRequestHandler = async (req, res) => {
   const { body, files, user } = req;
@@ -25,15 +29,15 @@ export const createNewBook: CreateBookRequestHandler = async (req, res) => {
 
   const newBook = new BookModel<BookDoc>({
     title,
-    // description,
-    // genre,
-    // language,
-    // fileInfo: { size: formatFileSize(fileInfo.size), id: "" },
-    // price,
-    // publicationName,
-    // publishedAt,
-    // slug: "",
-    // author: new Types.ObjectId(user.authorId),
+    description,
+    genre,
+    language,
+    fileInfo: { size: formatFileSize(fileInfo.size), id: "" },
+    price,
+    publicationName,
+    publishedAt,
+    slug: "",
+    author: new Types.ObjectId(user.authorId),
   });
 
   newBook.slug = slugify(`${newBook.title} ${newBook._id}`, {
@@ -58,20 +62,17 @@ export const createNewBook: CreateBookRequestHandler = async (req, res) => {
     });
   }
 
-  const bookStoragePath = path.join(__dirname, "../books");
-
-  if (!fs.existsSync(bookStoragePath)) {
-    fs.mkdirSync(bookStoragePath);
-  }
-
   const uniqueFileName = slugify(`${newBook._id} ${newBook.title}.epub`, {
     lower: true,
     replacement: "-",
   });
-  const filePath = path.join(bookStoragePath, uniqueFileName);
 
-  fs.writeFileSync(filePath, fs.readFileSync(book.filepath));
+  uploadBookToLocalDir(book, uniqueFileName);
+  newBook.fileInfo.id = uniqueFileName;
 
-  // await newBook.save();
+  await AuthorModel.findByIdAndUpdate(user.authorId, {
+    $push: { books: newBook._id },
+  });
+  await newBook.save();
   res.send();
 };
