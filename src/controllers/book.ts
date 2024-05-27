@@ -152,6 +152,49 @@ export const updateBook: UpdateBookRequestHandler = async (req, res) => {
   book.publishedAt = publishedAt;
   book.price = price;
 
+  if (uploadMethod === "local") {
+    if (
+      newBookFile &&
+      !Array.isArray(newBookFile) &&
+      newBookFile.mimetype === "application/epub+zip"
+    ) {
+      // remove old book file (epub) from storage
+      const uploadPath = path.join(__dirname, "../books");
+      const oldFilePath = path.join(uploadPath, book.fileInfo.id);
+
+      if (!fs.existsSync(oldFilePath))
+        return sendErrorResponse({
+          message: "Book file not found!",
+          status: 404,
+          res,
+        });
+
+      fs.unlinkSync(oldFilePath);
+
+      // add new book to the storage
+      const newFileName = slugify(`${book._id} ${book.title}`, {
+        lower: true,
+        replacement: "-",
+      });
+      const newFilePath = path.join(uploadPath, newFileName);
+      const file = fs.readFileSync(newBookFile.filepath);
+      fs.writeFileSync(newFilePath, file);
+
+      book.fileInfo = {
+        id: newFileName,
+        size: formatFileSize(fileInfo?.size || newBookFile.size),
+      };
+    }
+
+    if (cover && !Array.isArray(cover) && cover.mimetype?.startsWith("image")) {
+      // remove old cover file if exists
+      if (book.cover?.id) {
+        await cloudinary.uploader.destroy(book.cover.id);
+      }
+      book.cover = await uploadCoverToCloudinary(cover);
+    }
+  }
+
   let fileUploadUrl = "";
   if (uploadMethod === "aws") {
     if (
