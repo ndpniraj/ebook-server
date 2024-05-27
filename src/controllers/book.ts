@@ -17,6 +17,8 @@ import {
   uploadCoverToCloudinary,
 } from "@/utils/fileUpload";
 import AuthorModel from "@/models/author";
+import path from "path";
+import cloudinary from "@/cloud/cludinary";
 
 export const createNewBook: CreateBookRequestHandler = async (req, res) => {
   const { body, files, user } = req;
@@ -90,8 +92,6 @@ export const createNewBook: CreateBookRequestHandler = async (req, res) => {
       uniqueKey: fileName,
     });
 
-    newBook.fileInfo.id = fileName;
-
     // this will upload cover to the cloud
     if (cover && !Array.isArray(cover) && cover.mimetype?.startsWith("image")) {
       const uniqueFileName = slugify(`${newBook._id} ${newBook.title}.png`, {
@@ -103,6 +103,7 @@ export const createNewBook: CreateBookRequestHandler = async (req, res) => {
     }
   }
 
+  newBook.fileInfo.id = fileName;
   await AuthorModel.findByIdAndUpdate(user.authorId, {
     $push: {
       books: newBook._id,
@@ -128,7 +129,7 @@ export const updateBook: UpdateBookRequestHandler = async (req, res) => {
     slug,
   } = body;
 
-  const { cover } = files;
+  const { cover, book: newBookFile } = files;
 
   const book = await BookModel.findOne({
     slug,
@@ -150,4 +151,51 @@ export const updateBook: UpdateBookRequestHandler = async (req, res) => {
   book.genre = genre;
   book.publishedAt = publishedAt;
   book.price = price;
+
+  if (uploadMethod === "local") {
+    if (
+      newBookFile &&
+      !Array.isArray(newBookFile) &&
+      newBookFile.mimetype === "application/epub+zip"
+    ) {
+      // remove old book file (epub) from storage
+      const uploadPath = path.join(__dirname, "../books");
+      const oldFilePath = path.join(uploadPath, book.fileInfo.id);
+
+      if (!fs.existsSync(oldFilePath))
+        return sendErrorResponse({
+          message: "Book file not found!",
+          status: 404,
+          res,
+        });
+
+      fs.unlinkSync(oldFilePath);
+
+      // add new book to the storage
+      const newFileName = slugify(`${book._id} ${book.title}`, {
+        lower: true,
+        replacement: "-",
+      });
+      const newFilePath = path.join(uploadPath, newFileName);
+      const file = fs.readFileSync(newBookFile.filepath);
+      fs.writeFileSync(newFilePath, file);
+
+      book.fileInfo = {
+        id: newFileName,
+        size: formatFileSize(fileInfo?.size || newBookFile.size),
+      };
+    }
+
+    if (cover && !Array.isArray(cover) && cover.mimetype?.startsWith("image")) {
+      // remove old cover file if exists
+      if (book.cover?.id) {
+        await cloudinary.uploader.destroy(book.cover.id);
+      }
+      book.cover = await uploadCoverToCloudinary(cover);
+    }
+  }
+
+  await book.save();
+
+  res.send();
 };
