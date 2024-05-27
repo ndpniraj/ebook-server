@@ -1,5 +1,5 @@
 import BookModel, { BookDoc } from "@/models/book";
-import { CreateBookRequestHandler } from "@/types";
+import { CreateBookRequestHandler, UpdateBookRequestHandler } from "@/types";
 import {
   formatFileSize,
   generateS3ClientPublicUrl,
@@ -110,4 +110,23 @@ export const createNewBook: CreateBookRequestHandler = async (req, res) => {
   });
   await newBook.save();
   res.send(fileUploadUrl);
+};
+
+export const updateBook: UpdateBookRequestHandler = async (req, res) => {
+  const { body, files, user } = req;
+
+  const {
+    title,
+    description,
+    genre,
+    language,
+    fileInfo,
+    price,
+    publicationName,
+    publishedAt,
+    uploadMethod,
+    slug,
+  } = body;
+
+  const { cover, book } = files;
 };
