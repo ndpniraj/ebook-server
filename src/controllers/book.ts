@@ -128,5 +128,26 @@ export const updateBook: UpdateBookRequestHandler = async (req, res) => {
     slug,
   } = body;
 
-  const { cover, book } = files;
+  const { cover } = files;
+
+  const book = await BookModel.findOne({
+    slug,
+    author: user.authorId,
+  });
+
+  if (!book) {
+    return sendErrorResponse({
+      message: "Book not found!",
+      status: 404,
+      res,
+    });
+  }
+
+  book.title = title;
+  book.description = description;
+  book.language = language;
+  book.publicationName = publicationName;
+  book.genre = genre;
+  book.publishedAt = publishedAt;
+  book.price = price;
 };
