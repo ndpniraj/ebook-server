@@ -10,6 +10,7 @@ import { fileParser } from "./middlewares/file";
 import authorRouter from "./routes/author";
 import bookRouter from "./routes/book";
 import formidable from "formidable";
+import reviewRouter from "./routes/review";
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use("/books", express.static(publicPath));
 app.use("/auth", authRouter);
 app.use("/author", authorRouter);
 app.use("/book", bookRouter);
+app.use("/review", reviewRouter);
 
 app.post("/test", async (req, res) => {
   const form = formidable({
