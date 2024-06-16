@@ -1,4 +1,4 @@
-import { addReview } from "@/controllers/reivew";
+import { addReview, getReview } from "@/controllers/reivew";
 import { isAuth, isPurchasedByTheUser } from "@/middlewares/auth";
 import { newReviewSchema, validate } from "@/middlewares/validator";
 import { Router } from "express";
@@ -12,5 +12,6 @@ reviewRouter.post(
   isPurchasedByTheUser,
   addReview
 );
+reviewRouter.get("/:bookId", isAuth, getReview);
 
 export default reviewRouter;
