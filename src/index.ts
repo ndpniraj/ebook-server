@@ -11,6 +11,8 @@ import authorRouter from "./routes/author";
 import bookRouter from "./routes/book";
 import formidable from "formidable";
 import reviewRouter from "./routes/review";
+import ReviewModel from "./models/review";
+import { Types } from "mongoose";
 
 const app = express();
 
@@ -32,15 +34,22 @@ app.use("/author", authorRouter);
 app.use("/book", bookRouter);
 app.use("/review", reviewRouter);
 
-app.post("/test", async (req, res) => {
-  const form = formidable({
-    uploadDir: path.join(__dirname, "./books"),
-    filename(name, ext, part, form) {
-      return name + ".jpg";
+app.get("/test", async (req, res) => {
+  const review = await ReviewModel.aggregate([
+    {
+      $match: {
+        book: new Types.ObjectId("66547159a5bf5a163af3f049"),
+      },
     },
-  });
-  await form.parse(req);
-  res.json({});
+    {
+      $group: {
+        _id: null,
+        totalRatings: { $sum: "$rating" },
+      },
+    },
+  ]);
+
+  res.json({ review });
 });
 
 app.use(errorHandler);
