@@ -1,9 +1,16 @@
 import { updateBookHistory } from "@/controllers/history";
-import { isAuth } from "@/middlewares/auth";
+import { isAuth, isPurchasedByTheUser } from "@/middlewares/auth";
+import { historyValidationSchema, validate } from "@/middlewares/validator";
 import { Router } from "express";
 
 const historyRouter = Router();
 
-historyRouter.post("/", isAuth, updateBookHistory);
+historyRouter.post(
+  "/",
+  isAuth,
+  validate(historyValidationSchema),
+  isPurchasedByTheUser,
+  updateBookHistory
+);
 
 export default historyRouter;
