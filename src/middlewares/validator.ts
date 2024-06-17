@@ -234,6 +234,10 @@ export const historyValidationSchema = z.object({
       })
     )
     .optional(),
+  remove: z.boolean({
+    required_error: "Remove is missing!",
+    invalid_type_error: "remove must be a boolean value!",
+  }),
 });
 
 export const validate = <T extends ZodRawShape>(

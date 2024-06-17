@@ -5,7 +5,7 @@ export const updateBookHistory: UpdateHistoryRequestHandler = async (
   req,
   res
 ) => {
-  const { bookId, highlights, lastLocation } = req.body;
+  const { bookId, highlights, lastLocation, remove } = req.body;
 
   let history = await HistoryModel.findOne({
     book: bookId,
@@ -21,7 +21,24 @@ export const updateBookHistory: UpdateHistoryRequestHandler = async (
     });
   } else {
     if (lastLocation) history.lastLocation = lastLocation;
-    if (highlights?.length) history.highlights.push(...highlights);
+
+    // storing highlights
+    if (highlights?.length && !remove) history.highlights.push(...highlights);
+
+    // removing highlights
+    if (highlights?.length && remove) {
+      //   history.highlights = history.highlights.filter((item) => {
+      //     const highlight = highlights.find((h) => {
+      //       if (h.selection === item.selection) {
+      //         return h;
+      //       }
+      //     });
+      //     if (!highlight) return true;
+      //   });
+      history.highlights = history.highlights.filter(
+        (item) => !highlights.find((h) => h.selection === item.selection)
+      );
+    }
   }
 
   await history.save();
