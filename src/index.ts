@@ -13,6 +13,7 @@ import formidable from "formidable";
 import reviewRouter from "./routes/review";
 import ReviewModel from "./models/review";
 import { Types } from "mongoose";
+import historyRouter from "./routes/history";
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use("/auth", authRouter);
 app.use("/author", authorRouter);
 app.use("/book", bookRouter);
 app.use("/review", reviewRouter);
+app.use("/history", historyRouter);
 
 app.get("/test", async (req, res) => {
   const [result] = await ReviewModel.aggregate<{ averageRating: number }>([
