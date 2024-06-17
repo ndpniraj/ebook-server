@@ -14,6 +14,13 @@ type UpdateBookBody = z.infer<typeof updateBookSchema>;
 type AddReviewBody = z.infer<typeof newReviewSchema>;
 type BookHistoryBody = z.infer<typeof historyValidationSchema>;
 
+type PurchasedByTheUserBody = { bookId: string };
+
+export type IsPurchasedByTheUserHandler = RequestHandler<
+  {},
+  {},
+  PurchasedByTheUserBody
+>;
 export type RequestAuthorHandler = RequestHandler<{}, {}, AuthorHandlerBody>;
 export type CreateBookRequestHandler = RequestHandler<{}, {}, NewBookBody>;
 export type UpdateBookRequestHandler = RequestHandler<{}, {}, UpdateBookBody>;

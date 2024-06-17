@@ -1,5 +1,5 @@
 import UserModel from "@/models/user";
-import { AddReviewRequestHandler } from "@/types";
+import { AddReviewRequestHandler, IsPurchasedByTheUserHandler } from "@/types";
 import { formatUserProfile, sendErrorResponse } from "@/utils/helper";
 import { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
@@ -54,7 +54,7 @@ export const isAuth: RequestHandler = async (req, res, next) => {
   next();
 };
 
-export const isPurchasedByTheUser: AddReviewRequestHandler = async (
+export const isPurchasedByTheUser: IsPurchasedByTheUserHandler = async (
   req,
   res,
   next
