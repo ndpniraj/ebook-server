@@ -35,7 +35,7 @@ app.use("/book", bookRouter);
 app.use("/review", reviewRouter);
 
 app.get("/test", async (req, res) => {
-  const review = await ReviewModel.aggregate([
+  const [result] = await ReviewModel.aggregate<{ averageRating: number }>([
     {
       $match: {
         book: new Types.ObjectId("66547159a5bf5a163af3f049"),
@@ -44,12 +44,12 @@ app.get("/test", async (req, res) => {
     {
       $group: {
         _id: null,
-        totalRatings: { $sum: "$rating" },
+        averageRating: { $avg: "$rating" },
       },
     },
   ]);
 
-  res.json({ review });
+  res.json({ review: result.averageRating.toFixed(1) });
 });
 
 app.use(errorHandler);
