@@ -1,6 +1,7 @@
 import {
   createNewBook,
   getAllPurchasedBooks,
+  getBookByGenre,
   getBooksPublicDetails,
   updateBook,
 } from "@/controllers/book";
@@ -33,5 +34,6 @@ bookRouter.patch(
 );
 bookRouter.get("/list", isAuth, getAllPurchasedBooks);
 bookRouter.get("/details/:slug", getBooksPublicDetails);
+bookRouter.get("/by-genre/:genre", getBookByGenre);
 
 export default bookRouter;

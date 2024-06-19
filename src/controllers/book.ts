@@ -344,3 +344,33 @@ export const getBooksPublicDetails: RequestHandler = async (req, res) => {
     },
   });
 };
+
+export const getBookByGenre: RequestHandler = async (req, res) => {
+  const books = await BookModel.find({ genre: req.params.genre }).limit(5);
+
+  res.json({
+    books: books.map((book) => {
+      const {
+        _id,
+        title,
+        cover,
+        averageRating,
+        slug,
+        genre,
+        price: { mrp, sale },
+      } = book;
+      return {
+        id: _id,
+        title,
+        genre,
+        slug,
+        cover: cover?.url,
+        rating: averageRating?.toFixed(1),
+        price: {
+          mrp: (mrp / 100).toFixed(2), // $1 100C/100 = $1
+          sale: (sale / 100).toFixed(2), // 1.50
+        },
+      };
+    }),
+  });
+};
