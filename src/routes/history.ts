@@ -1,4 +1,4 @@
-import { updateBookHistory } from "@/controllers/history";
+import { getBookHistory, updateBookHistory } from "@/controllers/history";
 import { isAuth, isPurchasedByTheUser } from "@/middlewares/auth";
 import { historyValidationSchema, validate } from "@/middlewares/validator";
 import { Router } from "express";
@@ -12,5 +12,6 @@ historyRouter.post(
   isPurchasedByTheUser,
   updateBookHistory
 );
+historyRouter.get("/:bookId", isAuth, getBookHistory);
 
 export default historyRouter;
