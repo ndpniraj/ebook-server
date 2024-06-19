@@ -5,6 +5,7 @@ interface ReviewDoc {
   book: ObjectId;
   rating: number;
   content?: string;
+  createdAt: Date;
 }
 
 const reviewSchema = new Schema<ReviewDoc>(
