@@ -1,10 +1,13 @@
 import { Model, ObjectId, Schema, model } from "mongoose";
 
-interface HistoryDoc {
-  book: ObjectId;
-  reader: ObjectId;
+export interface Settings {
   lastLocation: string;
   highlights: { selection: string; fill: string }[];
+}
+
+interface HistoryDoc extends Settings {
+  book: ObjectId;
+  reader: ObjectId;
 }
 
 const historySchema = new Schema<HistoryDoc>(

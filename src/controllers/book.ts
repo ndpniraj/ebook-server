@@ -21,6 +21,7 @@ import path from "path";
 import cloudinary from "@/cloud/cludinary";
 import { RequestHandler } from "express";
 import UserModel from "@/models/user";
+import HistoryModel, { Settings } from "@/models/history";
 
 export const createNewBook: CreateBookRequestHandler = async (req, res) => {
   const { body, files, user } = req;
@@ -373,4 +374,36 @@ export const getBookByGenre: RequestHandler = async (req, res) => {
       };
     }),
   });
+};
+
+export const generateBookAccessUrl: RequestHandler = async (req, res) => {
+  const { slug } = req.params;
+
+  const book = await BookModel.findOne({ slug });
+  if (!book)
+    return sendErrorResponse({ res, message: "Book not found!", status: 404 });
+
+  const user = await UserModel.findOne({ _id: req.user.id, books: book._id });
+  if (!user)
+    return sendErrorResponse({ res, message: "User not found!", status: 404 });
+
+  const history = await HistoryModel.findOne({
+    reader: req.user.id,
+    book: book._id,
+  });
+
+  const settings: Settings = {
+    lastLocation: "",
+    highlights: [],
+  };
+
+  if (history) {
+    settings.highlights = history.highlights.map((h) => ({
+      fill: h.fill,
+      selection: h.selection,
+    }));
+    settings.lastLocation = history.lastLocation;
+  }
+
+  res.json({ settings });
 };

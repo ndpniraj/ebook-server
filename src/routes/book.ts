@@ -1,5 +1,6 @@
 import {
   createNewBook,
+  generateBookAccessUrl,
   getAllPurchasedBooks,
   getBookByGenre,
   getBooksPublicDetails,
@@ -35,5 +36,6 @@ bookRouter.patch(
 bookRouter.get("/list", isAuth, getAllPurchasedBooks);
 bookRouter.get("/details/:slug", getBooksPublicDetails);
 bookRouter.get("/by-genre/:genre", getBookByGenre);
+bookRouter.get("/read/:slug", isAuth, generateBookAccessUrl);
 
 export default bookRouter;
