@@ -1,6 +1,7 @@
 import {
   createNewBook,
   getAllPurchasedBooks,
+  getBooksPublicDetails,
   updateBook,
 } from "@/controllers/book";
 import { isAuth, isAuthor } from "@/middlewares/auth";
@@ -31,5 +32,6 @@ bookRouter.patch(
   updateBook
 );
 bookRouter.get("/list", isAuth, getAllPurchasedBooks);
+bookRouter.get("/details/:slug", getBooksPublicDetails);
 
 export default bookRouter;
