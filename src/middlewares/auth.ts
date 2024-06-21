@@ -1,3 +1,4 @@
+import BookModel from "@/models/book";
 import UserModel from "@/models/user";
 import { AddReviewRequestHandler, IsPurchasedByTheUserHandler } from "@/types";
 import { formatUserProfile, sendErrorResponse } from "@/utils/helper";
@@ -76,4 +77,28 @@ export const isPurchasedByTheUser: IsPurchasedByTheUserHandler = async (
 export const isAuthor: RequestHandler = (req, res, next) => {
   if (req.user.role === "author") next();
   else sendErrorResponse({ message: "Invalid request!", res, status: 401 });
+};
+
+export const isValidReadingRequest: RequestHandler = async (req, res, next) => {
+  const url = req.url;
+  const regex = new RegExp("/([^/?]+.epub)");
+  const regexMatch = url.match(regex);
+
+  if (!regexMatch)
+    return sendErrorResponse({ res, message: "Invalid request!", status: 403 });
+
+  const bookFileId = regexMatch[1];
+  const book = await BookModel.findOne({ "fileInfo.id": bookFileId });
+  if (!book)
+    return sendErrorResponse({ res, message: "Invalid request!", status: 403 });
+
+  const user = await UserModel.findOne({ _id: req.user.id, books: book._id });
+  if (!user)
+    return sendErrorResponse({
+      res,
+      message: "Unauthorized request!",
+      status: 403,
+    });
+
+  next();
 };
