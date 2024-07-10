@@ -1,7 +1,15 @@
 import BookModel, { BookDoc } from "@/models/book";
 import { CreateBookRequestHandler, UpdateBookRequestHandler } from "@/types";
-import { formatFileSize, sendErrorResponse } from "@/utils/helper";
-import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import {
+  formatFileSize,
+  generateS3ClientPublicUrl,
+  sendErrorResponse,
+} from "@/utils/helper";
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+} from "@aws-sdk/client-s3";
 import { ObjectId, Types } from "mongoose";
 import slugify from "slugify";
 import fs from "fs";
@@ -18,6 +26,7 @@ import cloudinary from "@/cloud/cludinary";
 import { RequestHandler } from "express";
 import UserModel from "@/models/user";
 import HistoryModel, { Settings } from "@/models/history";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 export const createNewBook: CreateBookRequestHandler = async (req, res) => {
   const { body, files, user } = req;
@@ -401,8 +410,12 @@ export const generateBookAccessUrl: RequestHandler = async (req, res) => {
     settings.lastLocation = history.lastLocation;
   }
 
-  res.json({
-    settings,
-    url: `${process.env.BOOK_API_URL}/${book.fileInfo.id}`,
+  // generate access url if you are using aws
+  const bookGetCommand = new GetObjectCommand({
+    Bucket: process.env.AWS_PRIVATE_BUCKET,
+    Key: book.fileInfo.id,
   });
+  const accessUrl = await getSignedUrl(s3Client, bookGetCommand);
+
+  res.json({ settings, url: accessUrl });
 };

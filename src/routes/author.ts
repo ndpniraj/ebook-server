@@ -1,5 +1,9 @@
-import { getAuthorDetails, registerAuthor } from "@/controllers/author";
-import { isAuth } from "@/middlewares/auth";
+import {
+  getAuthorDetails,
+  registerAuthor,
+  updateAuthor,
+} from "@/controllers/author";
+import { isAuth, isAuthor } from "@/middlewares/auth";
 import { newAuthorSchema, validate } from "@/middlewares/validator";
 import { Router } from "express";
 
@@ -10,6 +14,13 @@ authorRouter.post(
   isAuth,
   validate(newAuthorSchema),
   registerAuthor
+);
+authorRouter.patch(
+  "/",
+  isAuth,
+  isAuthor,
+  validate(newAuthorSchema),
+  updateAuthor
 );
 authorRouter.get("/:slug", getAuthorDetails);
 

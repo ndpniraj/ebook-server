@@ -96,6 +96,13 @@ const bookSchema = new Schema<BookDoc>({
   },
 });
 
+bookSchema.pre("save", function (next) {
+  const { mrp, sale } = this.price;
+  this.price = { mrp: mrp * 100, sale: sale * 100 };
+
+  next();
+});
+
 const BookModel = model("Book", bookSchema);
 
 export default BookModel as Model<BookDoc>;

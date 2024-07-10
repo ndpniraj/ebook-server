@@ -57,7 +57,10 @@ export const updateAvatarToAws = async (
 
   return {
     id: uniqueFileName,
-    url: generateS3ClientPublicUrl("ebook-public", uniqueFileName),
+    url: generateS3ClientPublicUrl(
+      process.env.AWS_PUBLIC_BUCKET!,
+      uniqueFileName
+    ),
   };
 };
 

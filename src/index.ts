@@ -2,6 +2,7 @@ import "express-async-errors";
 import "@/db/connect";
 import express, { ErrorRequestHandler } from "express";
 import path from "path";
+import cors from "cors";
 
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth";
@@ -26,6 +27,7 @@ const publicPath = path.join(__dirname, "./books");
 //     next();
 //   });
 // });
+app.use(cors({ origin: [process.env.APP_URL!], credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
