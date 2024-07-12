@@ -22,6 +22,6 @@ authorRouter.patch(
   validate(newAuthorSchema),
   updateAuthor
 );
-authorRouter.get("/:slug", getAuthorDetails);
+authorRouter.get("/:id", getAuthorDetails);
 
 export default authorRouter;
