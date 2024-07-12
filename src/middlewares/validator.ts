@@ -274,7 +274,7 @@ export const cartItemsSchema = z.object({
 
           return arg;
         }),
-      count: z
+      quantity: z
         .number({
           required_error: "Count is missing!",
           invalid_type_error: "Count must be number!",
