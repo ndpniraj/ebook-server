@@ -276,10 +276,10 @@ export const cartItemsSchema = z.object({
         }),
       quantity: z
         .number({
-          required_error: "Count is missing!",
-          invalid_type_error: "Count must be number!",
+          required_error: "Quantity is missing!",
+          invalid_type_error: "Quantity must be number!",
         })
-        .nonnegative("Invalid count!"),
+        .nonnegative("Invalid quantity!"),
     })
   ),
 });
