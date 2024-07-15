@@ -274,12 +274,10 @@ export const cartItemsSchema = z.object({
 
           return arg;
         }),
-      quantity: z
-        .number({
-          required_error: "Quantity is missing!",
-          invalid_type_error: "Quantity must be number!",
-        })
-        .nonnegative("Invalid quantity!"),
+      quantity: z.number({
+        required_error: "Quantity is missing!",
+        invalid_type_error: "Quantity must be number!",
+      }),
     })
   ),
 });

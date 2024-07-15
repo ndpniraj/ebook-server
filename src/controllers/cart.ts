@@ -23,7 +23,13 @@ export const updateCart: CartRequestHandler = async (req, res) => {
         ({ product }) => item.product === product.toString()
       );
       if (oldProduct) {
-        oldProduct.quantity = item.quantity;
+        oldProduct.quantity += item.quantity;
+        // if quantity is 0 or less then zero remove product from the cart
+        if (oldProduct.quantity <= 0) {
+          cart.items = cart.items.filter(
+            ({ product }) => oldProduct.product !== product
+          );
+        }
       } else {
         cart.items.push({
           product: item.product as any,
