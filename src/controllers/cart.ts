@@ -83,3 +83,8 @@ export const getCart: RequestHandler = async (req, res) => {
     },
   });
 };
+
+export const clearCart: RequestHandler = async (req, res) => {
+  await CartModel.findOneAndUpdate({ userId: req.user.id }, { items: [] });
+  res.json();
+};
