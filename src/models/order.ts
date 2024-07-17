@@ -9,23 +9,18 @@ type OrderItem = {
 
 interface OrderDocument {
   userId: ObjectId;
-  stripeCustomerId: string;
-  paymentId: string;
-  totalAmount: number;
-  paymentStatus: string;
-  paymentErrorMessage: string;
   orderItems: OrderItem[];
+  stripeCustomerId?: string;
+  paymentId?: string;
+  totalAmount?: number;
+  paymentStatus?: string;
+  paymentErrorMessage?: string;
   createAt: Date;
 }
 
 const schema = new Schema<OrderDocument>(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    stripeCustomerId: { type: String, required: true },
-    paymentId: { type: String, required: true },
-    totalAmount: { type: Number, required: true },
-    paymentStatus: { type: String, required: true },
-    paymentErrorMessage: { type: String },
     orderItems: [
       {
         id: { type: Schema.Types.ObjectId, ref: "Book", required: true },
@@ -34,6 +29,11 @@ const schema = new Schema<OrderDocument>(
         qty: { type: Number, required: true },
       },
     ],
+    stripeCustomerId: String,
+    paymentId: String,
+    totalAmount: Number,
+    paymentStatus: String,
+    paymentErrorMessage: String,
   },
   { timestamps: true }
 );

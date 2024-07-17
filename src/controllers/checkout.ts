@@ -1,5 +1,6 @@
 import { BookDoc } from "@/models/book";
 import CartModel from "@/models/cart";
+import OrderModel from "@/models/order";
 import stripe from "@/stripe";
 import { sanitizeUrl, sendErrorResponse } from "@/utils/helper";
 import { RequestHandler } from "express";
@@ -11,7 +12,10 @@ export const checkout: RequestHandler = async (req, res) => {
     return sendErrorResponse({ res, message: "Invalid cart id!", status: 401 });
   }
 
-  const cart = await CartModel.findById(cartId).populate<{
+  const cart = await CartModel.findOne({
+    _id: cartId,
+    userId: req.user.id,
+  }).populate<{
     items: { product: BookDoc; quantity: number }[];
   }>({
     path: "items.product",
@@ -21,13 +25,25 @@ export const checkout: RequestHandler = async (req, res) => {
     return sendErrorResponse({ res, message: "Cart not found!", status: 404 });
   }
 
+  const newOrder = await OrderModel.create({
+    userId: req.user.id,
+    orderItems: cart.items.map(({ product, quantity }) => {
+      return {
+        id: product._id,
+        price: product.price.sale,
+        qty: quantity,
+        totalPrice: product.price.sale * quantity,
+      };
+    }),
+  });
+
   // now if the cart is valid and there are products inside the cart we will send those information to the stripe and generate the payment link.
   const customer = await stripe.customers.create({
     name: req.user.name,
     email: req.user.email,
     metadata: {
       userId: req.user.id,
-      cartId,
+      orderId: newOrder._id.toString(),
       type: "checkout",
     },
   });
