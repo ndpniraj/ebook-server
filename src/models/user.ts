@@ -9,6 +9,7 @@ export interface UserDoc {
   avatar?: { url: string; id: string };
   authorId?: ObjectId;
   books: ObjectId[];
+  orders?: ObjectId[];
 }
 
 const userSchema = new Schema<UserDoc>({
@@ -44,6 +45,12 @@ const userSchema = new Schema<UserDoc>({
     {
       type: Schema.ObjectId,
       ref: "Book",
+    },
+  ],
+  orders: [
+    {
+      type: Schema.ObjectId,
+      ref: "Order",
     },
   ],
 });
