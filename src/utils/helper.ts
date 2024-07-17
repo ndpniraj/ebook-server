@@ -41,3 +41,7 @@ export const generateS3ClientPublicUrl = (
 ): string => {
   return `https://${bucketName}.s3.amazonaws.com/${uniqueKey}`;
 };
+
+export const sanitizeUrl = (url: string) => {
+  return url.replace(/ /g, "%20");
+};
