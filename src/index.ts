@@ -18,6 +18,7 @@ import historyRouter from "./routes/history";
 import { isAuth, isValidReadingRequest } from "./middlewares/auth";
 import cartRouter from "./routes/cart";
 import checkoutRouter from "./routes/checkout";
+import webhookRouter from "./routes/webhook";
 
 const app = express();
 
@@ -30,6 +31,7 @@ const publicPath = path.join(__dirname, "./books");
 //   });
 // });
 app.use(cors({ origin: [process.env.APP_URL!], credentials: true }));
+app.use("/webhook", webhookRouter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
