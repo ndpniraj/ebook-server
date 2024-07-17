@@ -17,6 +17,7 @@ import { Types } from "mongoose";
 import historyRouter from "./routes/history";
 import { isAuth, isValidReadingRequest } from "./middlewares/auth";
 import cartRouter from "./routes/cart";
+import checkoutRouter from "./routes/checkout";
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use("/book", bookRouter);
 app.use("/review", reviewRouter);
 app.use("/history", historyRouter);
 app.use("/cart", cartRouter);
+app.use("/checkout", checkoutRouter);
 
 app.get("/test", async (req, res) => {
   const [result] = await ReviewModel.aggregate<{ averageRating: number }>([
