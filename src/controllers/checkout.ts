@@ -1,13 +1,9 @@
 import { BookDoc } from "@/models/book";
 import CartModel from "@/models/cart";
+import stripe from "@/stripe";
 import { sanitizeUrl, sendErrorResponse } from "@/utils/helper";
 import { RequestHandler } from "express";
 import { isValidObjectId } from "mongoose";
-import Stripe from "stripe";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-06-20",
-});
 
 export const checkout: RequestHandler = async (req, res) => {
   const { cartId } = req.body;
