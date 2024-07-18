@@ -34,7 +34,7 @@ export const handlePayment: RequestHandler = async (req, res) => {
       const customer = (await stripe.customers.retrieve(
         customerId
       )) as unknown as StripeCustomer;
-      const { orderId, type, userId } = customer.metadata;
+      const { orderId, userId } = customer.metadata;
 
       const order = await OrderModel.findByIdAndUpdate(orderId, {
         stripeCustomerId: customerId,
