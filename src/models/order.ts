@@ -15,7 +15,7 @@ interface OrderDocument {
   totalAmount?: number;
   paymentStatus?: string;
   paymentErrorMessage?: string;
-  createAt: Date;
+  createdAt: Date;
 }
 
 const schema = new Schema<OrderDocument>(
