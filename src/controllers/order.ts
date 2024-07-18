@@ -1,6 +1,8 @@
 import { BookDoc } from "@/models/book";
 import OrderModel from "@/models/order";
+import UserModel from "@/models/user";
 import { RequestHandler } from "express";
+import { isValidObjectId } from "mongoose";
 
 export const getOrders: RequestHandler = async (req, res) => {
   const orders = await OrderModel.find({
@@ -40,4 +42,17 @@ export const getOrders: RequestHandler = async (req, res) => {
       };
     }),
   });
+};
+
+export const getOrderStatus: RequestHandler = async (req, res) => {
+  const { bookId } = req.params;
+
+  let status = false;
+
+  if (!isValidObjectId(bookId)) return res.json({ status });
+
+  const user = await UserModel.findOne({ _id: req.user.id, books: bookId });
+  if (user) status = true;
+
+  res.json({ status });
 };
