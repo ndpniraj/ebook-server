@@ -112,7 +112,7 @@ export const getOrderSuccessStatus: RequestHandler = async (req, res) => {
       }
     );
 
-    return res.json({ orders: data });
+    return res.json({ orders: data, totalAmount: order.totalAmount });
   }
 
   sendErrorResponse({

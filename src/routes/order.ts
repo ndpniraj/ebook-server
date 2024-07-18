@@ -10,6 +10,6 @@ const orderRouter = Router();
 
 orderRouter.get("/", isAuth, getOrders);
 orderRouter.get("/check-status/:bookId", isAuth, getOrderStatus);
-orderRouter.get("/success", isAuth, getOrderSuccessStatus);
+orderRouter.post("/success", isAuth, getOrderSuccessStatus);
 
 export default orderRouter;
