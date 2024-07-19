@@ -10,14 +10,16 @@ import { isValidObjectId } from "mongoose";
 export const getOrders: RequestHandler = async (req, res) => {
   const orders = await OrderModel.find({
     userId: req.user.id,
-  }).populate<{
-    orderItems: {
-      id: BookDoc;
-      price: number;
-      qty: number;
-      totalPrice: number;
-    }[];
-  }>("orderItems.id");
+  })
+    .populate<{
+      orderItems: {
+        id: BookDoc;
+        price: number;
+        qty: number;
+        totalPrice: number;
+      }[];
+    }>("orderItems.id")
+    .sort("-createdAt");
 
   res.json({
     orders: orders.map((item) => {
@@ -112,7 +114,12 @@ export const getOrderSuccessStatus: RequestHandler = async (req, res) => {
       }
     );
 
-    return res.json({ orders: data, totalAmount: order.totalAmount });
+    return res.json({
+      orders: data,
+      totalAmount: order.totalAmount
+        ? (order.totalAmount / 100).toFixed()
+        : "0",
+    });
   }
 
   sendErrorResponse({
