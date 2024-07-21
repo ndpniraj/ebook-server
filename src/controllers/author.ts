@@ -1,4 +1,5 @@
 import AuthorModel from "@/models/author";
+import { BookDoc } from "@/models/book";
 import UserModel from "@/models/user";
 import { RequestAuthorHandler } from "@/types";
 import { sendErrorResponse } from "@/utils/helper";
@@ -53,7 +54,9 @@ export const updateAuthor: RequestAuthorHandler = async (req, res) => {
 export const getAuthorDetails: RequestHandler = async (req, res) => {
   const { id } = req.params;
 
-  const author = await AuthorModel.findById(id);
+  const author = await AuthorModel.findById(id).populate<{ books: BookDoc[] }>(
+    "books"
+  );
   if (!author)
     return sendErrorResponse({
       res,
@@ -66,5 +69,19 @@ export const getAuthorDetails: RequestHandler = async (req, res) => {
     name: author.name,
     about: author.about,
     socialLinks: author.socialLinks,
+    books: author.books?.map((book) => {
+      return {
+        id: book._id?.toString(),
+        title: book.title,
+        slug: book.slug,
+        genre: book.genre,
+        price: {
+          mrp: (book.price.mrp / 100).toFixed(2),
+          sale: (book.price.sale / 100).toFixed(2),
+        },
+        cover: book.cover?.url,
+        rating: book.averageRating?.toFixed(1),
+      };
+    }),
   });
 };
