@@ -95,7 +95,7 @@ export const verifyAuthToken: RequestHandler = async (req, res) => {
   res.cookie("authToken", authToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV !== "development",
-    sameSite: "strict",
+    sameSite: "lax",
     expires: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
   });
 
