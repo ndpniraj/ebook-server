@@ -289,6 +289,7 @@ export const getAllPurchasedBooks: RequestHandler = async (req, res) => {
       author: {
         name: book.author.name,
         slug: book.author.slug,
+        id: book.author._id,
       },
     })),
   });
@@ -426,7 +427,7 @@ interface RecommendedBooks {
   genre: string;
   slug: string;
   cover?: string;
-  rating: string;
+  rating?: string;
   price: {
     mrp: string;
     sale: string;
@@ -448,7 +449,7 @@ export interface AggregationResult {
     _id: ObjectId;
   };
   slug: string;
-  averageRatings: number;
+  averageRatings?: number;
 }
 
 export const getRecommendedBooks: RequestHandler = async (req, res) => {
@@ -507,7 +508,7 @@ export const getRecommendedBooks: RequestHandler = async (req, res) => {
       sale: (book.price.sale / 100).toFixed(2),
     },
     cover: book.cover?.url,
-    rating: book.averageRatings.toFixed(1),
+    rating: book.averageRatings?.toFixed(1),
   }));
 
   res.json(result);

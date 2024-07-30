@@ -3,6 +3,7 @@ import "@/db/connect";
 import express, { ErrorRequestHandler } from "express";
 import path from "path";
 import cors from "cors";
+import morgan from "morgan";
 
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth";
@@ -31,11 +32,13 @@ const publicPath = path.join(__dirname, "./books");
 //     next();
 //   });
 // });
+app.use(morgan("dev"));
 app.use(cors({ origin: [process.env.APP_URL!], credentials: true }));
 app.use("/webhook", webhookRouter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
 app.use("/books", isAuth, isValidReadingRequest, express.static(publicPath));
 
 app.use("/auth", authRouter);
