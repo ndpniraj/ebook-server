@@ -1,7 +1,7 @@
 import BookModel, { BookDoc } from "@/models/book";
 import CartModel from "@/models/cart";
 import OrderModel from "@/models/order";
-import stripe from "@/stripe";
+import stripe from "@/stripe-local";
 import { sanitizeUrl, sendErrorResponse } from "@/utils/helper";
 import { RequestHandler } from "express";
 import { isValidObjectId } from "mongoose";

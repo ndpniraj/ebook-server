@@ -1,7 +1,7 @@
 import CartModel from "@/models/cart";
 import OrderModel from "@/models/order";
 import UserModel from "@/models/user";
-import stripe from "@/stripe";
+import stripe from "@/stripe-local";
 import {
   StripeCustomer,
   StripeFailedIntent,

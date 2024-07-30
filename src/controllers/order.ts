@@ -1,7 +1,7 @@
 import { BookDoc } from "@/models/book";
 import OrderModel from "@/models/order";
 import UserModel from "@/models/user";
-import stripe from "@/stripe";
+import stripe from "@/stripe-local";
 import { StripeCustomer } from "@/types/stripe";
 import { sendErrorResponse } from "@/utils/helper";
 import { RequestHandler } from "express";
