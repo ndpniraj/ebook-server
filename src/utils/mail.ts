@@ -4,6 +4,7 @@ import { MailtrapClient } from "mailtrap";
 interface VerificationMailOptions {
   link: string;
   to: string;
+  name: string;
 }
 
 const TOKEN = process.env.MAILTRAP_TOKEN!;
@@ -19,26 +20,26 @@ const transport = nodemailer.createTransport({
   },
 });
 
-const sendVerificationMailProd = () => {
+const sendVerificationMailProd = async (options: VerificationMailOptions) => {
   const sender = {
     email: "no-reply@fsniraj.dev",
     name: "User Sign In",
   };
   const recipients = [
     {
-      email: "ndpniraj@gmail.com",
+      email: options.to,
     },
   ];
 
-  client
-    .send({
-      from: sender,
-      to: recipients,
-      subject: "You are awesome!",
-      text: "Congrats for sending test email with Mailtrap!",
-      category: "Integration Test",
-    })
-    .then(console.log, console.error);
+  await client.send({
+    from: sender,
+    to: recipients,
+    template_uuid: "e1e23630-8364-4fdb-814f-32eea50e192f",
+    template_variables: {
+      user_name: options.name,
+      sign_in_link: options.link,
+    },
+  });
 };
 
 const sendVerificationTestMail = async (options: VerificationMailOptions) => {
@@ -58,7 +59,7 @@ const mail = {
   async sendVerificationMail(options: VerificationMailOptions) {
     if (process.env.NODE_ENV === "development")
       await sendVerificationTestMail(options);
-    else sendVerificationMailProd();
+    else await sendVerificationMailProd(options);
   },
 };
 

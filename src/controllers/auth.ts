@@ -48,6 +48,7 @@ export const generateAuthLink: RequestHandler = async (req, res) => {
   await mail.sendVerificationMail({
     link,
     to: user.email,
+    name: user.name || user.email,
   });
 
   res.json({ message: "Please check you email for link." });
