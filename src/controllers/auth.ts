@@ -113,7 +113,14 @@ export const sendProfileInfo: RequestHandler = (req, res) => {
 };
 
 export const logout: RequestHandler = (req, res) => {
-  res.clearCookie("authToken").send();
+  res
+    .clearCookie("authToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV !== "development",
+      sameSite: "none",
+      path: "/",
+    })
+    .send();
 };
 
 export const updateProfile: RequestHandler = async (req, res) => {
