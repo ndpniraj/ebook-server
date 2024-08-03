@@ -11,6 +11,7 @@ export interface BookDoc {
   publicationName: string;
   averageRating?: number;
   genre: string;
+  copySold?: number;
   price: {
     mrp: number;
     sale: number;

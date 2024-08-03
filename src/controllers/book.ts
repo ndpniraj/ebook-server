@@ -482,3 +482,10 @@ export const getRecommendedBooks: RequestHandler = async (req, res) => {
 
   res.json(result);
 };
+
+export const deleteBook: RequestHandler = async (req, res) => {
+  const { bookId } = req.params;
+  const { user } = req;
+
+  const book = await BookModel.findOne({ _id: bookId, author: user.authorId });
+};
