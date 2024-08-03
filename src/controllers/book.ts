@@ -506,29 +506,30 @@ export const deleteBook: RequestHandler = async (req, res) => {
     return res.json({ success: false });
   }
 
-  // remove old book file (epub) from storage
-  const uploadPath = path.join(__dirname, "../books");
-  const oldFilePath = path.join(uploadPath, book.fileInfo.id);
-
-  if (!fs.existsSync(oldFilePath))
-    return sendErrorResponse({
-      message: "Book file not found!",
-      status: 404,
-      res,
-    });
-
-  fs.unlinkSync(oldFilePath);
-
-  // remove cover
-  if (book.cover?.id) {
-    await cloudinary.uploader.destroy(book.cover.id);
-  }
-
   await BookModel.findByIdAndDelete(book._id);
   const author = await AuthorModel.findById(user.authorId);
   if (author) {
     author.books = author.books.filter((id) => id.toString() !== bookId);
     await author.save();
+  }
+
+  const coverId = book.cover?.id;
+  const bookFileId = book.fileInfo.id;
+
+  if (coverId) {
+    const deleteCommand = new DeleteObjectCommand({
+      Bucket: process.env.AWS_PUBLIC_BUCKET,
+      Key: coverId,
+    });
+    await s3Client.send(deleteCommand);
+  }
+
+  if (bookFileId) {
+    const deleteCommand = new DeleteObjectCommand({
+      Bucket: process.env.AWS_PRIVATE_BUCKET,
+      Key: bookFileId,
+    });
+    await s3Client.send(deleteCommand);
   }
 
   res.json({ success: true });
