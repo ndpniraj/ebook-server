@@ -21,6 +21,7 @@ import cartRouter from "./routes/cart";
 import checkoutRouter from "./routes/checkout";
 import webhookRouter from "./routes/webhook";
 import orderRouter from "./routes/order";
+import searchRouter from "./routes/search";
 
 const app = express();
 
@@ -49,6 +50,7 @@ app.use("/history", historyRouter);
 app.use("/cart", cartRouter);
 app.use("/checkout", checkoutRouter);
 app.use("/order", orderRouter);
+app.use("/search", searchRouter);
 
 app.get("/test", async (req, res) => {
   const [result] = await ReviewModel.aggregate<{ averageRating: number }>([

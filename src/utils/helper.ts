@@ -1,3 +1,5 @@
+import { AggregationResult } from "@/controllers/book";
+import { BookDoc } from "@/models/book";
 import { UserDoc } from "@/models/user";
 import { Request, Response } from "express";
 
@@ -25,6 +27,38 @@ export const formatUserProfile = (user: UserDoc): Request["user"] => {
     signedUp: user.signedUp,
     authorId: user.authorId?.toString(),
     books: user.books.map((b) => b.toString()),
+  };
+};
+
+interface FormattedBooks {
+  id: string;
+  title: string;
+  genre: string;
+  slug: string;
+  cover?: string;
+  rating?: string;
+  price: {
+    mrp: string;
+    sale: string;
+  };
+}
+
+export const formatBook = (
+  book: BookDoc | AggregationResult
+): FormattedBooks => {
+  const { _id, title, slug, genre, price, cover, averageRating } = book;
+
+  return {
+    id: _id?.toString() || "",
+    title: title,
+    slug: slug,
+    genre: genre,
+    price: {
+      mrp: (price.mrp / 100).toFixed(2),
+      sale: (price.sale / 100).toFixed(2),
+    },
+    cover: cover?.url,
+    rating: averageRating?.toFixed(1),
   };
 };
 
