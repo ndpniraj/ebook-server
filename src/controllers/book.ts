@@ -489,14 +489,19 @@ export const deleteBook: RequestHandler = async (req, res) => {
   const { user } = req;
 
   const book = await BookModel.findOne({ _id: bookId, author: user.authorId });
-};
+  if (!book)
+    return sendErrorResponse({ message: "Book not found!", status: 404, res });
 
-export const updateCopySold: RequestHandler = async (req, res) => {
-  const books = await BookModel.find();
-  const p = books.map((book) =>
-    BookModel.findByIdAndUpdate(book._id, { status: "published" })
-  );
-  await Promise.all(p);
+  if (book.copySold && book.copySold >= 1) {
+    return res.json({ success: false });
+  }
 
-  res.send();
+  await BookModel.findByIdAndUpdate(book._id);
+  const author = await AuthorModel.findById(user.authorId);
+  if (author) {
+    author.books = author.books.filter((id) => id.toString() !== bookId);
+    await author.save();
+  }
+
+  res.json({ success: true });
 };
