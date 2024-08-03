@@ -208,7 +208,7 @@ export const updateBook: UpdateBookRequestHandler = async (req, res) => {
     if (
       newBookFile &&
       !Array.isArray(newBookFile) &&
-      newBookFile.mimetype === "application/epub+zip"
+      fileInfo?.type === "application/epub+zip"
     ) {
       // remove the old book from cloud (bucket)
       const deleteCommand = new DeleteObjectCommand({

@@ -68,7 +68,7 @@ export const isPurchasedByTheUser: IsPurchasedByTheUserHandler = async (
   if (!user)
     return sendErrorResponse({
       res,
-      message: "Sorry you are not allowed to add review!",
+      message: "Sorry we didn't found the book inside your library!",
       status: 403,
     });
 

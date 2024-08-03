@@ -92,10 +92,11 @@ export const verifyAuthToken: RequestHandler = async (req, res) => {
     expiresIn: "15d",
   });
 
+  const isDevModeOn = process.env.NODE_ENV === "development";
   res.cookie("authToken", authToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV !== "development",
-    sameSite: "none",
+    secure: !isDevModeOn,
+    sameSite: isDevModeOn ? "strict" : "none",
     expires: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
   });
 
@@ -113,11 +114,12 @@ export const sendProfileInfo: RequestHandler = (req, res) => {
 };
 
 export const logout: RequestHandler = (req, res) => {
+  const isDevModeOn = process.env.NODE_ENV === "development";
   res
     .clearCookie("authToken", {
       httpOnly: true,
-      secure: process.env.NODE_ENV !== "development",
-      sameSite: "none",
+      secure: !isDevModeOn,
+      sameSite: isDevModeOn ? "strict" : "none",
       path: "/",
     })
     .send();
