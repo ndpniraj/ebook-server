@@ -1,5 +1,6 @@
 import {
   getAuthorDetails,
+  getBooks,
   registerAuthor,
   updateAuthor,
 } from "@/controllers/author";
@@ -22,6 +23,7 @@ authorRouter.patch(
   validate(newAuthorSchema),
   updateAuthor
 );
+authorRouter.get("/books/:authorId", isAuth, getBooks);
 authorRouter.get("/:id", getAuthorDetails);
 
 export default authorRouter;
