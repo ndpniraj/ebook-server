@@ -487,14 +487,9 @@ export const deleteBook: RequestHandler = async (req, res) => {
   const { bookId } = req.params;
   const { user } = req;
   const deleteMethodAddedDate = 1722704247287;
-  const now = Date.now();
 
   if (!isValidObjectId(bookId)) {
     return sendErrorResponse({ message: "Invalid book id!", res, status: 422 });
-  }
-
-  if (deleteMethodAddedDate >= now) {
-    return res.json({ success: false });
   }
 
   const book = await BookModel.findOne({ _id: bookId, author: user.authorId });
@@ -502,8 +497,31 @@ export const deleteBook: RequestHandler = async (req, res) => {
     return sendErrorResponse({ message: "Book not found!", res, status: 404 });
   }
 
+  const bookCreationTime = book._id.getTimestamp().getTime();
+  if (deleteMethodAddedDate >= bookCreationTime) {
+    return res.json({ success: false });
+  }
+
   if (book.copySold >= 1) {
     return res.json({ success: false });
+  }
+
+  // remove old book file (epub) from storage
+  const uploadPath = path.join(__dirname, "../books");
+  const oldFilePath = path.join(uploadPath, book.fileInfo.id);
+
+  if (!fs.existsSync(oldFilePath))
+    return sendErrorResponse({
+      message: "Book file not found!",
+      status: 404,
+      res,
+    });
+
+  fs.unlinkSync(oldFilePath);
+
+  // remove cover
+  if (book.cover?.id) {
+    await cloudinary.uploader.destroy(book.cover.id);
   }
 
   await BookModel.findByIdAndDelete(book._id);
@@ -513,5 +531,5 @@ export const deleteBook: RequestHandler = async (req, res) => {
     await author.save();
   }
 
-  res.json();
+  res.json({ success: true });
 };
