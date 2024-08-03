@@ -482,3 +482,13 @@ export const getRecommendedBooks: RequestHandler = async (req, res) => {
 
   res.json(result);
 };
+
+export const deleteBook: RequestHandler = async (req, res) => {
+  const { bookId } = req.params;
+
+  if (!isValidObjectId(bookId)) {
+    return sendErrorResponse({ message: "Invalid book id!", res, status: 422 });
+  }
+
+  res.json();
+};
