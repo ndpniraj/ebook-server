@@ -42,6 +42,7 @@ export const createNewBook: CreateBookRequestHandler = async (req, res) => {
     publicationName,
     publishedAt,
     uploadMethod,
+    status,
   } = body;
 
   const { cover, book } = files;
@@ -57,6 +58,8 @@ export const createNewBook: CreateBookRequestHandler = async (req, res) => {
     publishedAt,
     slug: "",
     author: new Types.ObjectId(user.authorId),
+    status,
+    copySold: 0,
   });
 
   let fileUploadUrl = "";
@@ -136,6 +139,7 @@ export const updateBook: UpdateBookRequestHandler = async (req, res) => {
     publishedAt,
     uploadMethod,
     slug,
+    status,
   } = body;
 
   const { cover, book: newBookFile } = files;
@@ -160,6 +164,7 @@ export const updateBook: UpdateBookRequestHandler = async (req, res) => {
   book.genre = genre;
   book.publishedAt = publishedAt;
   book.price = price;
+  book.status = status;
 
   if (uploadMethod === "local") {
     if (
@@ -325,6 +330,7 @@ export const getBooksPublicDetails: RequestHandler = async (req, res) => {
     price: { mrp, sale },
     fileInfo,
     averageRating,
+    status,
   } = book;
 
   res.json({
@@ -332,6 +338,7 @@ export const getBooksPublicDetails: RequestHandler = async (req, res) => {
       id: _id,
       title,
       genre,
+      status,
       language,
       slug,
       description,
