@@ -28,7 +28,6 @@ import { RequestHandler } from "express";
 import UserModel from "@/models/user";
 import HistoryModel, { Settings } from "@/models/history";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import OrderModel from "@/models/order";
 
 export const createNewBook: CreateBookRequestHandler = async (req, res) => {
   const { body, files, user } = req;
@@ -43,7 +42,6 @@ export const createNewBook: CreateBookRequestHandler = async (req, res) => {
     publicationName,
     publishedAt,
     uploadMethod,
-    status,
   } = body;
 
   const { cover, book } = files;
@@ -59,7 +57,6 @@ export const createNewBook: CreateBookRequestHandler = async (req, res) => {
     publishedAt,
     slug: "",
     author: new Types.ObjectId(user.authorId),
-    status,
   });
 
   let fileUploadUrl = "";
@@ -139,7 +136,6 @@ export const updateBook: UpdateBookRequestHandler = async (req, res) => {
     publishedAt,
     uploadMethod,
     slug,
-    status,
   } = body;
 
   const { cover, book: newBookFile } = files;
@@ -164,7 +160,6 @@ export const updateBook: UpdateBookRequestHandler = async (req, res) => {
   book.genre = genre;
   book.publishedAt = publishedAt;
   book.price = price;
-  book.status = status;
 
   if (uploadMethod === "local") {
     if (
@@ -486,43 +481,4 @@ export const getRecommendedBooks: RequestHandler = async (req, res) => {
   const result = recommendedBooks.map<RecommendedBooks>(formatBook);
 
   res.json(result);
-};
-
-export const deleteBook: RequestHandler = async (req, res) => {
-  const { bookId } = req.params;
-  const { user } = req;
-
-  const book = await BookModel.findOne({ _id: bookId, author: user.authorId });
-  if (!book)
-    return sendErrorResponse({ message: "Book not found!", status: 404, res });
-
-  if (book.copySold && book.copySold >= 1) {
-    return res.json({ success: false });
-  }
-
-  // remove old book file (epub) from storage
-  const uploadPath = path.join(__dirname, "../books");
-  const oldFilePath = path.join(uploadPath, book.fileInfo.id);
-
-  if (!fs.existsSync(oldFilePath))
-    return sendErrorResponse({
-      message: "Book file not found!",
-      status: 404,
-      res,
-    });
-
-  fs.unlinkSync(oldFilePath);
-
-  if (book.cover?.id) {
-    await cloudinary.uploader.destroy(book.cover.id);
-  }
-
-  await BookModel.findByIdAndDelete(book._id);
-  const author = await AuthorModel.findById(user.authorId);
-  if (author) {
-    author.books = author.books.filter((id) => id.toString() !== bookId);
-    await author.save();
-  }
-
-  res.json({ success: true });
 };

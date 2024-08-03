@@ -46,10 +46,6 @@ const commonBookSchema = {
     required_error: "Please define a valid uploadMethod",
     message: "uploadMethod needs to be either aws or local",
   }),
-  status: z.enum(["published", "unpublished"], {
-    required_error: "Please select at least one status!",
-    message: "Please select at least one status!",
-  }),
   title: z
     .string({
       required_error: "Title is missing!",

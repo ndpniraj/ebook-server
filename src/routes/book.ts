@@ -40,6 +40,5 @@ bookRouter.get("/details/:slug", getBooksPublicDetails);
 bookRouter.get("/by-genre/:genre", getBookByGenre);
 bookRouter.get("/read/:slug", isAuth, generateBookAccessUrl);
 bookRouter.get("/recommended/:bookId", getRecommendedBooks);
-bookRouter.delete("/:bookId", isAuth, isAuthor, deleteBook);
 
 export default bookRouter;
