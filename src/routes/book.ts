@@ -7,6 +7,7 @@ import {
   getBooksPublicDetails,
   getRecommendedBooks,
   updateBook,
+  updateCopySold,
 } from "@/controllers/book";
 import { isAuth, isAuthor } from "@/middlewares/auth";
 import { fileParser } from "@/middlewares/file";
@@ -41,5 +42,6 @@ bookRouter.get("/by-genre/:genre", getBookByGenre);
 bookRouter.get("/read/:slug", isAuth, generateBookAccessUrl);
 bookRouter.get("/recommended/:bookId", getRecommendedBooks);
 bookRouter.delete("/:bookId", isAuth, isAuthor, deleteBook);
+bookRouter.post("/update-copy-sold", updateCopySold);
 
 export default bookRouter;
