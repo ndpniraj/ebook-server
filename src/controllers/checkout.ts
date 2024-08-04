@@ -48,6 +48,22 @@ export const checkout: RequestHandler = async (req, res) => {
     return sendErrorResponse({ res, message: "Cart not found!", status: 404 });
   }
 
+  let invalidPurchase = false;
+  for (let cartItem of cart.items) {
+    if (cartItem.product.status === "unpublished") {
+      invalidPurchase = true;
+      break;
+    }
+  }
+
+  if (invalidPurchase) {
+    return sendErrorResponse({
+      res,
+      message: "Sorry some of the books in your cart is no longer for sale!",
+      status: 403,
+    });
+  }
+
   const newOrder = await OrderModel.create({
     userId: req.user.id,
     orderItems: cart.items.map(({ product, quantity }) => {
@@ -112,11 +128,20 @@ export const instantCheckout: RequestHandler = async (req, res) => {
   }
 
   const product = await BookModel.findById(productId);
+
   if (!product) {
     return sendErrorResponse({
       res,
       message: "Product not found!",
       status: 404,
+    });
+  }
+
+  if (product.status === "unpublished") {
+    return sendErrorResponse({
+      res,
+      message: "Sorry this book is no longer for sale!",
+      status: 403,
     });
   }
 

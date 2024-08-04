@@ -363,7 +363,10 @@ export const getBooksPublicDetails: RequestHandler = async (req, res) => {
 };
 
 export const getBookByGenre: RequestHandler = async (req, res) => {
-  const books = await BookModel.find({ genre: req.params.genre }).limit(5);
+  const books = await BookModel.find({
+    genre: req.params.genre,
+    status: { $ne: "unpublished" },
+  }).limit(5);
 
   books.map(formatBook);
   res.json({
@@ -454,7 +457,13 @@ export const getRecommendedBooks: RequestHandler = async (req, res) => {
   }
 
   const recommendedBooks = await BookModel.aggregate<AggregationResult>([
-    { $match: { genre: book.genre, _id: { $ne: book._id } } },
+    {
+      $match: {
+        genre: book.genre,
+        _id: { $ne: book._id },
+        status: { $ne: "unpublished" },
+      },
+    },
     {
       $lookup: {
         localField: "_id",
