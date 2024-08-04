@@ -126,7 +126,7 @@ export const createNewBook: CreateBookRequestHandler = async (req, res) => {
   await UserModel.findByIdAndUpdate(req.user.id, {
     $push: { books: newBook._id },
   });
-  res.send(fileUploadUrl);
+  res.json({ fileUploadUrl, slug: newBook.slug });
 };
 
 export const updateBook: UpdateBookRequestHandler = async (req, res) => {
