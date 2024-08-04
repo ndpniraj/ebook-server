@@ -122,6 +122,10 @@ export const createNewBook: CreateBookRequestHandler = async (req, res) => {
     },
   });
   await newBook.save();
+
+  await UserModel.findByIdAndUpdate(req.user.id, {
+    $push: { books: newBook._id },
+  });
   res.send(fileUploadUrl);
 };
 
