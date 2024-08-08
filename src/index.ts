@@ -34,7 +34,12 @@ const publicPath = path.join(__dirname, "./books");
 //   });
 // });
 app.use(morgan("dev"));
-app.use(cors({ origin: [process.env.APP_URL!], credentials: true }));
+app.use(
+  cors({
+    origin: [process.env.APP_URL!, process.env.APP_URL_2!],
+    credentials: true,
+  })
+);
 app.use("/webhook", webhookRouter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
